@@ -1,0 +1,170 @@
+# Location Editor v1.2
+
+locations = {}
+
+def draw_map(locations):
+    # Create a dictionary to store the map
+    map_draw = {}
+    # Loop through each location in the dictionary
+    for loc_id, loc_data in locations.items():
+        # Create a list to store the cells for this location
+        cells_list = []
+        # Loop through each cell in the location
+        for cell_id, cell_data in loc_data['cells'].items():
+            # Create a list to store the directions for this cell
+            cell_dirs = []
+            # Check each direction for an exit
+            for dir, exit_data in cell_data['exits'].items():
+                # Get the destination location and cell id from the exit data
+                dest_loc_id = exit_data['dest_loc']
+                dest_cell_id = exit_data['dest_cell']
+                # Check if the exit goes to a different location
+                if dest_loc_id != loc_id:
+                    # Add the direction and the destination location id to the cell directions list
+                    cell_dirs.append(dir + ':' + dest_loc_id)
+                else:
+                    # Add the direction and the destination cell id to the cell directions list
+                    cell_dirs.append(dir + ':' + dest_cell_id)
+            # Add the cell id and the directions list to the cells list for this location
+            cells_list.append(cell_id + ' ' + ' '.join(cell_dirs))
+        # Add the location id and the cells list to the map dictionary
+        map_draw[loc_id] = cells_list
+    # Return the map dictionary
+    return map_draw
+
+def draw_location(locations):
+    loc_draw = []
+    for loc_id, location in locations.items():
+        print(f"{location['name']} ({loc_id}):")
+        for y in range(5):
+            for x in range(5):
+                cell_id = f"cell{x+1}_{y+1}"
+                if cell_id in location['cells']:
+                    cell = location['cells'][cell_id]
+                    exits = cell['exits']
+                    if 'north' in exits:
+                        print(".", end="")
+                    else:
+                        print("-", end="")
+                    if 'east' in exits or 'west' in exits:
+                        print(" ", end="")
+                    else:
+                        print(".", end="")
+                    if 'south' in exits:
+                        print(".", end="")
+                    else:
+                        print("-", end="")
+                else:
+                    print(" ", end="")
+            print()
+        print()
+    return loc_draw
+
+
+def print_locations():
+    for loc_id, loc_data in locations.items():
+        print(f"Location ID: {loc_id}")
+        print(f"Location Name: {loc_data['location_name']}")
+        print("Cells:")
+        for cell_id, cell_data in loc_data['cells'].items():
+            print(f"  Cell ID: {cell_id}")
+            print(f"  Cell Name: {cell_data['cell_name']}")
+            print("  Directions:")
+            for dir_name, dir_id in cell_data['directions'].items():
+                print(f"    {dir_name}: {dir_id}")
+            print("")
+
+def add_location():
+    location_name = input("Enter location name: ")
+    cells = {}
+    location_id_count = len(locations) + 1
+    while True:
+        cell_name = input("Enter cell name (or 'q' to quit adding cells): ")
+        if cell_name == "q":
+            break
+        cell_id = f"loc{location_id_count}cell{len(cells)+1}"
+        directions = {}
+        for dir_name in ['north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest']:
+            print("""*NW * N * NE*
+                * W * o * E *
+                *SW * S * SE*""")
+            dir_id = input(f"Enter ID for {dir_name} direction: ")
+            directions[dir_name] = dir_id
+        cells[cell_id] = {
+            "cell_name": cell_name,
+            "directions": directions
+        }
+    locations[f"loc{location_id_count}"] = {
+        "location_name": location_name,
+        "cells": cells
+    }
+    print("Location added successfully!")
+
+def remove_location(location_id):
+    if location_id in locations:
+        del locations[location_id]
+        print(f"Location {location_id} removed.")
+    else:
+        print("Location not found.")
+
+def add_cell(location_id, cell_id, cell_name, cell_desc):
+    if location_id in locations:
+        if cell_id not in locations[location_id]["cells"]:
+            locations[location_id]["cells"][cell_id] = {"name": cell_name, "description": cell_desc, "exits": {}}
+            print(f"Cell {cell_id} added to {location_id}.")
+        else:
+            print("Cell already exists.")
+    else:
+        print(f"Location {location_id} not found.")
+
+def edit_cell():
+    loc_id = input("Podaj ID lokacji, której komórkę chcesz edytować: ")
+    if loc_id in locations:
+        cell_id = input("Podaj ID komórki do edycji: ")
+        if cell_id in locations[loc_id]['cells']:
+            directions = ['north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest']
+            for direction in directions:
+                direction_id = f"{loc_id}{cell_id}{direction}"
+                destination = input(f"Podaj ID lokacji docelowej dla kierunku {direction}: ")
+                locations[loc_id]['cells'][cell_id][direction_id]['destination'] = destination
+            print(f"Komórka {cell_id} w lokacji {loc_id} została zaktualizowana.")
+        else:
+            print(f"Komórka {cell_id} nie istnieje w lokacji {loc_id}.")
+    else:
+        print(f"Lokacja {loc_id} nie istnieje.")
+
+def remove_cell(location_id, cell_id):
+    if location_id in locations:
+        if cell_id in locations[location_id]["cells"]:
+            del locations[location_id]["cells"][cell_id]
+            print(f"Cell {cell_id} removed from {location_id}.")
+        else:
+            print("Cell not found.")
+    else:
+        print(f"Location {location_id} not found.")
+
+def add_exit(location_id, cell_id, direction, exit_id):
+    if location_id in locations:
+        if cell_id in locations[location_id]["cells"]:
+            if exit_id not in locations[location_id]["cells"][cell_id]["exits"]:
+                locations[location_id]["cells"][cell_id]["exits"][exit_id] = {"direction": direction}
+                print(f"Exit {exit_id} added to {cell_id}.")
+            else:
+                print("Exit already exists.")
+        else:
+            print(f"Cell {cell_id} not found in location {location_id}.")
+    else:
+        print(f"Location {location_id} not found.")
+
+def remove_exit(location_id, cell_id, exit_id):
+    if location_id in locations:
+        if cell_id in locations[location_id]["cells"]:
+            if exit_id in locations[location_id]["cells"][cell_id]["exits"]:
+                del locations[location_id]["cells"][cell_id]["exits"][exit_id]
+                print(f"Exit {exit_id} removed from {cell_id}.")
+            else:
+                print("Exit not found.")
+        else:
+            print(f"Cell {cell_id} not found in location {location_id}.")
+    else:
+        print(f"Location {location_id} not found.")
