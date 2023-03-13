@@ -7,7 +7,7 @@ class LocationEditor:
     - file_path (str): The path to the file containing the location data.
     - locations (dict): A nested dictionary of location data.
     """
-    VERSION = "0.11"
+    VERSION = "4.15"
 
     def __init__(self, file_path):
         self.file_path = file_path
