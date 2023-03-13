@@ -1,0 +1,61 @@
+locations = {}
+
+def create_location():
+    loc_id = input("Podaj ID nowej lokacji: ")
+    loc_name = input("Podaj nazwę nowej lokacji: ")
+    locations[loc_id] = {'location_name': loc_name, 'cells': {}}
+
+def edit_location():
+    loc_id = input("Podaj ID lokacji do edycji: ")
+    if loc_id in locations:
+        loc_name = input("Podaj nową nazwę lokacji: ")
+        locations[loc_id]['location_name'] = loc_name
+        print(f"Lokacja {loc_id} została zaktualizowana.")
+    else:
+        print(f"Lokacja {loc_id} nie istnieje.")
+
+def delete_location():
+    loc_id = input("Podaj ID lokacji do usunięcia: ")
+    if loc_id in locations:
+        del locations[loc_id]
+        print(f"Lokacja {loc_id} została usunięta.")
+    else:
+        print(f"Lokacja {loc_id} nie istnieje.")
+
+def create_cell():
+    loc_id = input("Podaj ID lokacji, do której chcesz dodać komórkę: ")
+    if loc_id in locations:
+        cell_id = input("Podaj ID nowej komórki: ")
+        directions = ['north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest']
+        cell_data = {}
+        for direction in directions:
+            direction_id = f"{loc_id}{cell_id}{direction}"
+            destination = input(f"Podaj ID lokacji docelowej dla kierunku {direction}: ")
+            cell_data[direction_id] = {'destination': destination}
+        locations[loc_id]['cells'][cell_id] = cell_data
+        print(f"Komórka {cell_id} została dodana do lokacji {loc_id}.")
+    else:
+        print(f"Lokacja {loc_id} nie istnieje.")
+
+def edit_cell():
+    loc_id = input("Podaj ID lokacji, której komórkę chcesz edytować: ")
+    if loc_id in locations:
+        cell_id = input("Podaj ID komórki do edycji: ")
+        if cell_id in locations[loc_id]['cells']:
+            directions = ['north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest']
+            for direction in directions:
+                direction_id = f"{loc_id}{cell_id}{direction}"
+                destination = input(f"Podaj ID lokacji docelowej dla kierunku {direction}: ")
+                locations[loc_id]['cells'][cell_id][direction_id]['destination'] = destination
+            print(f"Komórka {cell_id} w lokacji {loc_id} została zaktualizowana.")
+        else:
+            print(f"Komórka {cell_id} nie istnieje w lokacji {loc_id}.")
+    else:
+        print(f"Lokacja {loc_id} nie istnieje.")
+
+def delete_cell():
+    loc_id = input("Podaj ID lokacji, której komórkę chcesz usunąć: ")
+    if loc_id in locations:
+        cell_id = input("Podaj ID komórki do usunięcia: ")
+        if cell_id in locations[loc_id]['cells']:
+            del locations[loc_id]['cells'][cell_id]
