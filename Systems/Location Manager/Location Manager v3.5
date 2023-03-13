@@ -1,0 +1,339 @@
+# Location Manager v3.5
+
+import os
+
+LOCATIONS_FILE = "locations.txt"
+DIRECTIONS = ['north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest']
+loc_IDs = []
+
+def delete_connections(locations_list, location_id):
+    for loc_id in locations_list.keys():
+        if loc_id == location_id:
+            continue
+        cells = locations_list[loc_id]['cells']
+        for cell_id, cell_data in cells.items():
+            directions = cell_data['directions']
+            for dir_name, dir_id in directions.items():
+                if dir_id.startswith(location_id):
+                    del directions[dir_name]
+
+
+def read_locations():
+    # Check if the locations file exists
+    if os.path.isfile(LOCATIONS_FILE) and os.path.getsize(LOCATIONS_FILE) > 0:
+        # If the file exists and is not empty, read its contents into a dictionary
+        with open(LOCATIONS_FILE, 'r') as f:
+            locations = eval(f.read())
+        return locations
+    else:
+        locations = {0:{'name':'START','description':'You can edit it','cells':{},}}
+        return locations
+
+
+def get_location_containing_cell(locations, cell_id):
+    # Loop through each location in the dictionary
+    for loc_id, loc_data in locations.items():
+        # Check if the cell is in this location
+        if cell_id in loc_data['cells']:
+            return loc_id
+    # If the cell is not found in any location, return None
+    return None
+
+
+def display_locations(locations):
+    # Display a list of all locations to the user
+    print("Locations:")
+    for location_id in locations:
+        print(location_id)
+
+
+def get_location_id(locations):
+    # Ask the user which location they want to delete
+    location_id = input("Enter the ID or name of the location: ")
+
+    # Check if the location exists
+    if location_id not in locations.values() and location_id not in locations:
+        print(f"Error: Location {location_id} not found")
+        return None
+    elif location_id in locations:
+        return location_id
+    else:
+        for loc_id, loc_name in locations.items():
+            if loc_name == location_id:
+                return loc_id
+
+
+def is_cell_connected(locations, location_id, cell_id):
+    # Get the dictionary of cells for this location
+    cells_dict = locations[location_id]['cells']
+
+    # Loop through each cell in the location
+    for c_id, c_data in cells_dict.items():
+        # Check each direction for an exit
+        for exit_data in c_data['exits'].values():
+            # Get the destination cell id from the exit data
+            dest_cell_id = exit_data['dest_cell']
+            # Check if the destination cell id matches the given cell id
+            if dest_cell_id == cell_id:
+                return True
+    # If no matching connections were found, return False
+    return False
+
+
+def add_location():
+    locations = read_locations()
+
+    if not locations:
+        return print("No loacations inside")
+
+    # Get the details of the new location from the user
+    if len(locations) <= 1:
+        location_id = 1
+    elif len(locations) > 1:
+
+        for key in locations:
+            loc_IDs.append(key)
+            location_id = max(loc_IDs)
+        print("ID's in use: ", loc_IDs )
+
+    location_name = input("Enter the name of the new location: ")
+    location_description = input("Enter a brief description of the new location: ")
+
+    # Add the new location to the dictionary of locations
+    locations[location_id] = {
+        'name': location_name,
+        'description': location_description,
+        'cells': {}
+    }
+
+    with open(LOCATIONS_FILE, 'w') as f:
+        f.write(str(locations))
+
+    print(f"Location {location_name} added successfully")
+
+
+def delete_location():
+    locations = read_locations()
+
+    if not locations:
+        return
+
+    display_locations(locations)
+    location_id = get_location_id(locations)
+    if not location_id:
+        return
+
+    location_data = locations.pop(location_id)
+    delete_connections(locations, location_id)
+    
+    with open(LOCATIONS_FILE, 'w') as f:
+        f.write(str(locations))
+
+    print(f"Location {location_id} and its connections deleted successfully")
+
+
+def add_cell(locations):
+    location_id = get_location_id(locations)
+    if not location_id:
+        return
+
+    cells = locations[location_id]['cells']
+    cell_id = input("Enter the ID of the new cell: ")
+    if cell_id in cells:
+        print(f"Error: Cell {cell_id} already exists")
+        return
+
+    cell_data = {}
+    cell_data['description'] = input("Enter a description for the new cell: ")
+    cell_data['directions'] = {}
+
+    for dir_name in DIRECTIONS:
+        dir_id = input(f"Enter the ID of the cell in the {dir_name} direction (or press enter to skip): ")
+        if dir_id:
+            # Check if the destination cell exists in any location
+            dest_location_id = get_location_containing_cell(locations, dir_id)
+            if not dest_location_id:
+                print(f"Error: Cell {dir_id} not found in any location")
+                return
+            elif dest_location_id != location_id:
+                # Check if the destination cell is connected to this location
+                if not is_cell_connected(locations[dest_location_id], location_id):
+                    print(f"Error: Cell {dir_id} is not connected to location {location_id}")
+                    return
+
+            cell_data['directions'][dir_name] = dir_id
+
+    cells[cell_id] = cell_data
+    print(f"Cell {cell_id} added to location {location_id}")
+
+
+def edit_cells(locations):
+    # Ask the user which location to edit cells for
+    location_id = get_location_id(locations)
+    if not location_id:
+        return
+
+    # Display a list of cells for the location
+    cells = locations[location_id]["cells"]
+    print(f"Cells for location {location_id}:")
+    for cell_id in cells:
+        print(cell_id)
+
+    # Ask the user which cell to edit
+    cell_id = input("Enter the ID of the cell to edit: ")
+    if cell_id not in cells:
+        print(f"Error: Cell {cell_id} not found")
+        return
+
+    # Ask the user for the new directions
+    directions_str = input("Enter the new directions (comma-separated): ")
+    directions_list = [dir.strip() for dir in directions_str.split(",")]
+
+    # Update the cell data dictionary with the new directions
+    cell_data = cells[cell_id]
+    cell_data["directions"].clear()
+    for dir in directions_list:
+        cell_data["directions"][dir] = ""
+
+    # Write the updated locations dictionary to the file
+    with open(LOCATIONS_FILE, "w") as f:
+        f.write(str(locations))
+
+    print(f"Directions for cell {cell_id} updated")
+
+
+def delete_cell(locations):
+    location_id = get_location_id(locations)
+    if not location_id:
+        return
+
+    cells = locations[location_id]['cells']
+    cell_id = input("Enter the ID of the cell to delete: ")
+    if cell_id not in cells:
+        print(f"Error: Cell {cell_id} not found")
+        return
+
+    # Check if the cell is connected to any other cell
+    if is_cell_connected(cells[cell_id], cells):
+        print(f"Error: Cell {cell_id} is connected to another cell and cannot be deleted")
+        return
+
+    # Delete the cell
+    del cells[cell_id]
+    print(f"Cell {cell_id} deleted from location {location_id}")
+
+
+def draw_map_single_location(location):
+    # Create a dictionary to store the map
+    map_dict = {}
+    loc_id = location['id']
+    # Create a list to store the cells for this location
+    cells_list = []
+    # Loop through each cell in the location
+    for cell_id, cell_data in location['cells'].items():
+        # Create a list to store the directions for this cell
+        cell_dirs = []
+        # Check each direction for an exit
+        for dir, exit_data in cell_data['exits'].items():
+            # Get the destination location and cell id from the exit data
+            dest_loc_id = exit_data['dest_loc']
+            dest_cell_id = exit_data['dest_cell']
+            # Check if the exit goes to a different location
+            if dest_loc_id != loc_id:
+                # Add the direction and the destination location id to the cell directions list
+                cell_dirs.append(dir + ':' + dest_loc_id)
+            else:
+                # Add the direction and the destination cell id to the cell directions list
+                cell_dirs.append(dir + ':' + dest_cell_id)
+        # Add the cell id and the directions list to the cells list for this location
+        cells_list.append(cell_id + ' ' + ' '.join(cell_dirs))
+    # Add the location id and the cells list to the map dictionary
+    map_dict[loc_id] = cells_list
+    # Return the map dictionary
+    return print(map_dict)
+
+
+def draw_map(locations):
+    # Create a dictionary to store the map
+    map_dict = {}
+    # Loop through each location in the dictionary
+    for loc_id, loc_data in locations.items():
+        # Create a list to store the cells for this location
+        cells_list = []
+        # Loop through each cell in the location
+        for cell_id, cell_data in loc_data['cells'].items():
+            # Create a list to store the directions for this cell
+            cell_dirs = []
+            # Check each direction for an exit
+            for dir, exit_data in cell_data['exits'].items():
+                # Get the destination location and cell id from the exit data
+                dest_loc_id = exit_data['dest_loc']
+                dest_cell_id = exit_data['dest_cell']
+                # Check if the exit goes to a different location
+                if dest_loc_id != loc_id:
+                    # Add the direction and the destination location id to the cell directions list
+                    cell_dirs.append(dir + ':' + dest_loc_id)
+                else:
+                    # Add the direction and the destination cell id to the cell directions list
+                    cell_dirs.append(dir + ':' + dest_cell_id)
+            # Add the cell id and the directions list to the cells list for this location
+            cells_list.append(cell_id + ' ' + ' '.join(cell_dirs))
+        # Add the location id and the cells list to the map dictionary
+        map_dict[loc_id] = cells_list
+
+    # Print the map
+    for loc_id, cells_list in map_dict.items():
+        print(f"\nLocation ID: {loc_id}")
+        for cell in cells_list:
+            cell_parts = cell.split(' ')
+            cell_id = cell_parts[0]
+            cell_dirs = cell_parts[1:]
+            print(f"Cell ID: {cell_id}")
+            for cell_dir in cell_dirs:
+                dir_parts = cell_dir.split(':')
+                dir_name = dir_parts[0]
+                dir_dest = dir_parts[1]
+                print(f"    {dir_name} -> {dir_dest}")
+
+
+# Define the menu options
+OPTIONS = {
+    "1": "Add location",
+    "2": "Delete location",
+    "3": "Add cell",
+    "4": "Edit cells",
+    "5": "Quit"
+}
+
+
+# Define the main function
+def main():
+    while True:
+        # Display the menu options
+        print("Menu:")
+        for option_num, option_desc in OPTIONS.items():
+            print(f"{option_num}. {option_desc}")
+
+        # Get the user's choice
+        choice = input("Enter your choice: ")
+
+        # Execute the appropriate function based on the user's choice
+        if choice == "1":
+            add_location()
+        elif choice == "2":
+            delete_location()
+        elif choice == "3":
+            add_cell(locations)
+        elif choice == "4":
+            edit_cells(locations)
+        elif choice == "5":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
+# Call the main function
+if __name__ == "__main__":
+    locations = read_locations()
+    main()
