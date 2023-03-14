@@ -15,16 +15,18 @@ class LocationEditor:
         self.locations = {}
         self.load_file()
 
-    def load_file(self):
-        try:
+     def load_file(self):
+        if os.path.exists(self.file_path):
             with open(self.file_path, "r") as file:
                 self.locations = json.load(file)
-        except FileNotFoundError:
+        else:
             print("Location file not found. Creating empty file...")
             with open(self.file_path, "w") as file:
-                json.dump({}, file, indent=4)
-            self.locations = {}
-
+                template = LocationTemplate.get_template()
+                json.dump(template, file, indent=4)
+            with open(self.file_path, "r") as file:
+                self.locations = json.load(file)
+    
     def save_file(self):
         with open(self.file_path, "w") as file:
             json.dump(self.locations, file, indent=4)
@@ -59,3 +61,16 @@ class LocationTemplate:
             }
         }
         return template
+
+    
+class Location:
+    """
+    A class representing a location in a game.
+    """
+    def __init__(self, loc_id, name, description, type_, level, cells):
+        self.loc_id = loc_id
+        self.name = name
+        self.description = description
+        self.type = type_
+        self.level = level
+        self.cells = cells
