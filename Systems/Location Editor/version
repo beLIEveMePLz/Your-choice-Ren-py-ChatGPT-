@@ -1,0 +1,35 @@
+4.18.3
+
+Sure, the Location class is the class representing a location in the game. It has the following attributes:
+
+    loc_id: a unique identifier for the location.
+    name: the name of the location.
+    description: a description of the location.
+    type: the type of the location (e.g. dungeon, city, forest).
+    level: the level of the location (e.g. beginner, intermediate, advanced).
+    cells: a dictionary containing the cells of the location.
+
+And the following methods:
+
+    __init__(self, loc_id, name, description, type_, level, cells): the constructor method that initializes the attributes of the Location object.
+    add_cell(self, cell): a method that adds a new Cell object to the location.
+    edit_cell(self, cell_id, **kwargs): a method that allows editing a Cell object in the location by specifying the cell_id and the updated attributes as keyword arguments.
+    delete_cell(self, cell_id): a method that deletes a Cell object from the location by specifying the cell_id.
+    get_cell(self, cell_id): a method that returns a Cell object from the location by specifying the cell_id.
+    get_cells(self): a method that returns a list of all Cell objects in the location.
+    get_connections(self): a method that returns a dictionary containing the connections between the cells in the location.
+    check_connection(self, cell_id, direction): a method that checks if there is a connection between a cell and another cell in a specified direction.
+    connect_cells(self, cell_id, direction): a method that creates a connection between a cell and another cell in a specified direction.
+    disconnect_cells(self, cell_id, direction): a method that removes a connection between a cell and another cell in a specified direction.
+
+Do you need help with any specific method or attribute?
+
+Sure! Here's a list of the classes we have created so far:
+
+    LocationEditor: A class for editing locations in a game. It has methods to load, save and delete location data from a file, and it stores the location data in a nested dictionary.
+    LocationTemplate: A class that creates an empty location template.
+    Location: A class representing a location in a game. It has attributes for location ID, name, description, type, level, and a dictionary of Cell objects.
+    Cell: A class representing a cell in a location. It has attributes for cell ID, name, description, type, and a dictionary of Connection objects.
+    Connection: A class representing a connection between two cells. It has attributes for connection ID, direction, and a reference to the connected Cell object.
+
+We also have a ConnectionChecker class in progress, which will help us check the connections between cells.
