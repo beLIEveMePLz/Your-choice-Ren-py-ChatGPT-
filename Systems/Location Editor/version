@@ -48,7 +48,7 @@ Finally, you would need to store the data for the location and allow the user to
 
 Overall, while the system you describe would be complex to implement, it is certainly possible with the right tools and approach.
 
-
+automation
 
 Understood. Based on what you've described, it sounds like you have a good foundation for your game. You have a nested dictionary structure to store your locations, classes to create and check cells, and a class to display a map of your locations.
 
