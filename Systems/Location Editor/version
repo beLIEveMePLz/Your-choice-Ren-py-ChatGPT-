@@ -33,3 +33,25 @@ Sure! Here's a list of the classes we have created so far:
     Connection: A class representing a connection between two cells. It has attributes for connection ID, direction, and a reference to the connected Cell object.
 
 We also have a ConnectionChecker class in progress, which will help us check the connections between cells.
+
+automation 0.2
+
+Implementing the system you describe would require a significant amount of work, but it is certainly doable.
+
+First, you would need to create a graphical user interface (GUI) that can display the map of the location and allow the user to interact with it. This could be done using a graphics library like Pygame or Tkinter.
+
+Next, you would need to define the logic for creating cells and connections between them. This would involve detecting user input (e.g. arrow key presses) and using that input to determine the direction in which to create a new cell or connection.
+
+You would also need to handle edge cases, such as preventing the user from creating cells or connections in invalid locations, and ensuring that cells and connections are properly updated when they are edited or deleted.
+
+Finally, you would need to store the data for the location and allow the user to save and load locations. This could be done using a file format like JSON or YAML.
+
+Overall, while the system you describe would be complex to implement, it is certainly possible with the right tools and approach.
+
+
+
+Understood. Based on what you've described, it sounds like you have a good foundation for your game. You have a nested dictionary structure to store your locations, classes to create and check cells, and a class to display a map of your locations.
+
+If you're looking to develop your game further, you may want to consider creating classes to represent characters or items in your game, and defining their behavior and interactions with the location and cell classes. Additionally, you may want to create a class to manage game progress and save and load game state.
+
+You can also explore adding more features to your existing classes, such as allowing for more complex cell connections or adding different types of cells with unique properties. The possibilities are endless, and it all depends on what direction you want to take your game in.
