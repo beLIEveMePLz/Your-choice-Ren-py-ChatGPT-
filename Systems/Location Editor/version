@@ -48,10 +48,28 @@ Finally, you would need to store the data for the location and allow the user to
 
 Overall, while the system you describe would be complex to implement, it is certainly possible with the right tools and approach.
 
-automation
-
 Understood. Based on what you've described, it sounds like you have a good foundation for your game. You have a nested dictionary structure to store your locations, classes to create and check cells, and a class to display a map of your locations.
 
 If you're looking to develop your game further, you may want to consider creating classes to represent characters or items in your game, and defining their behavior and interactions with the location and cell classes. Additionally, you may want to create a class to manage game progress and save and load game state.
 
 You can also explore adding more features to your existing classes, such as allowing for more complex cell connections or adding different types of cells with unique properties. The possibilities are endless, and it all depends on what direction you want to take your game in.
+
+
+
+automation 0.7
+
+Sure, here is a list of the classes and their basic functionality that we have created so far:
+
+    LocationEditor - A GUI for editing a location dictionary.
+    Location - A class representing a location, consisting of cells with various properties.
+    Cell - A class representing a cell within a location, with properties such as walls, doors, and direction.
+    Connection - A class representing a connection between two cells.
+    ConnectionChecker - A class for checking the validity of a connection between two cells.
+    Template - A class for creating templates for new locations.
+    LocationCreator - A class for creating a new location based on a template.
+    LocationValidator - A class for validating user input when creating or editing a location.
+    AutomatedCellCreator - A class for automating the creation of cells in a location.
+
+In addition to these classes, we have also created a nested dictionary structure to represent a location and implemented methods for saving and loading locations to and from a file.
+
+Let me know if you have any questions or if there's anything else I can help you with!
