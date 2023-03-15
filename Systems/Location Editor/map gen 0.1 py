@@ -1,0 +1,23 @@
+class MapGenerator:
+    def __init__(self, locations):
+        self.locations = locations
+    
+    def generate_map(self):
+        map_ = ""
+        for loc_name in self.locations:
+            loc = self.locations[loc_name]
+            loc_map = self.generate_location_map(loc)
+            map_ += f"{loc_name}:\n{loc_map}\n"
+        return map_
+    
+    def generate_location_map(self, loc):
+        loc_map = ""
+        for r in range(loc.rows):
+            row_cells = []
+            for c in range(loc.cols):
+                if (r, c) in loc.cells:
+                    row_cells.append("O")
+                else:
+                    row_cells.append(" ")
+            loc_map += "|".join(row_cells) + "\n"
+        return loc_map
